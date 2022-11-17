@@ -1,5 +1,6 @@
 
 import './App.css';
+import Cat from './cat.js';
 import Cube from './cube.js';
 
 
@@ -10,6 +11,7 @@ function App() {
         CatPet v 0.0
       </header>
       <main>
+          <Cat/>
           <Cube/>
       </main>
       <footer>
