@@ -1,7 +1,6 @@
 
 import './App.css';
 import Cat from './cat.js';
-import Cube from './cube.js';
 
 
 function App() {
@@ -12,7 +11,6 @@ function App() {
       </header>
       <main>
           <Cat/>
-          <Cube/>
       </main>
       <footer>
           This is a test!
