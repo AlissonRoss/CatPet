@@ -1,7 +1,11 @@
 
 import * as THREE from 'three';
+// import { Loader } from 'three';
+import { MeshStandardMaterial } from 'three';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import Cat from '../src/assets/cat.obj';
+import Texture from '../src/assets/texture.png';
+
 
 
 let container;
@@ -18,33 +22,41 @@ scene.background = new THREE.Color('black');
 const light = new THREE.PointLight()
 light.position.set(2, 8, 50)
 scene.add(light)
-const ambientLight = new THREE.AmbientLight( 0xEF8642, 0.7);
+const ambientLight = new THREE.AmbientLight( 0xFFFFFF, 0.7);
 scene.add( ambientLight );
 
 scene.add( camera );
 
 // manager
-const objloader = new OBJLoader();
+const loadingManager = new THREE.LoadingManager();
+//OBJECT LOADER
+const objloader = new OBJLoader(loadingManager);
 objloader.load(Cat, ( obj ) => {
 
     const object = obj;
-    const texture = new THREE.TextureLoader().load('../src/assets/texture.png');
-    const material = new THREE.MeshBasicMaterial( { map: texture } );
-    objloader.setMaterials(material);
-    obj.rotation.x += Math.PI/70;
+    object.rotation.x += Math.PI/100;
+
+    //texture
+
+    const textureLoader = new THREE.TextureLoader(loadingManager);
+    const texture = textureLoader.load(Texture);
+    object.traverse(function (child) {   // aka setTexture
+        if (child instanceof THREE.Mesh) {
+            child.material.map = texture;
+        }
+    });
+    //add object to scene
     scene.add(object);
 });
 
-
-//
-
-
+//RENDERER
 renderer = new THREE.WebGLRenderer();
 container = renderer.domElement;
 renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( container );
 function render() {
+    
     renderer.render( scene, camera );
 } 
 var angle = 90;
