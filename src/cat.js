@@ -12,13 +12,13 @@ let container;
 let camera, scene, renderer;
 scene = new THREE.Scene();
 camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
-
+//CAMERA
 camera.position.z = 7;
 camera.lookAt( scene.position );
 
 // scene
 scene.background = new THREE.Color('black');
-
+//LIGHTING
 const light = new THREE.PointLight()
 light.position.set(2, 8, 50)
 scene.add(light)
@@ -26,6 +26,14 @@ const ambientLight = new THREE.AmbientLight( 0xFFFFFF, 0.7);
 scene.add( ambientLight );
 
 scene.add( camera );
+//X - PLANE
+const geometry = new THREE.PlaneGeometry( 10, 0.1 );
+const material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+const plane = new THREE.Mesh( geometry, material );
+scene.add( plane );
+//AXIS HELPER
+const axesHelper = new THREE.AxesHelper( 5 );
+scene.add( axesHelper );
 
 // manager
 const loadingManager = new THREE.LoadingManager();
@@ -35,8 +43,9 @@ objloader.load(Cat, ( obj ) => {
 
     const object = obj;
     object.rotation.x += Math.PI/100;
+    object.position.y += Math.PI/100;
 
-    //texture
+    //TEXTURE LOADER
 
     const textureLoader = new THREE.TextureLoader(loadingManager);
     const texture = textureLoader.load(Texture);
@@ -45,7 +54,7 @@ objloader.load(Cat, ( obj ) => {
             child.material.map = texture;
         }
     });
-    //add object to scene
+    //add CAT object to scene
     scene.add(object);
 });
 

@@ -13,7 +13,7 @@ function App() {
           <Cat/>
       </main>
       <footer>
-          This is a test!
+          Thanks for checking out my ThreeJS Testbed!
       </footer>
     </div>
   );
