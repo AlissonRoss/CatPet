@@ -1,19 +1,19 @@
 
 import * as THREE from 'three';
 // import { Loader } from 'three';
-import { MeshStandardMaterial } from 'three';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import Cat from '../src/assets/cat.obj';
 import Texture from '../src/assets/texture.png';
+import Stats from 'three/examples/jsm/libs/stats.module'
 
 
 
 let container;
 let camera, scene, renderer;
 scene = new THREE.Scene();
-camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+camera = new THREE.PerspectiveCamera( 75, window.innerWidth/ window.innerHeight, 1, 1000 );
 //CAMERA
-camera.position.z = 7;
+camera.position.z = 10;
 camera.lookAt( scene.position );
 
 // scene
@@ -62,12 +62,15 @@ objloader.load(Cat, ( obj ) => {
 renderer = new THREE.WebGLRenderer();
 container = renderer.domElement;
 renderer.setPixelRatio( window.devicePixelRatio );
-renderer.setSize( window.innerWidth, window.innerHeight );
+renderer.setSize( window.innerWidth, window.innerHeight - 100);
 document.body.appendChild( container );
 function render() {
     
     renderer.render( scene, camera );
 } 
+//STATS
+const stats = Stats();
+document.body.appendChild(stats.dom);
 var angle = 90;
 // var radius = 100; 
 
@@ -77,6 +80,8 @@ function animate() {
     camera.position.x = Math.cos( angle );  
     camera.position.y = Math.sin( angle );
     angle += 0.001;
+
+    stats.update()
     render();
 
 }

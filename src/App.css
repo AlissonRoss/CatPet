@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  background-color: transparent;
 }
 
 .App-logo {
@@ -31,8 +32,15 @@
   background-color: #282c34;
   max-height: 10vh;
 }
+.canvas{
+  position: absolute;
+  display: flex;
+  min-width: 100vw;
+  min-height: 100vh;
+}
 .footer{
-  position:absolute;
+  position: fixed;
+  background-color: transparent;
   left:0;
   bottom:0;
   right:0;

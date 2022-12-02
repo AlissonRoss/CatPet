@@ -6,9 +6,9 @@ import Cat from './cat.js';
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
+      {/* <header className="App-header">
         CatPet v 0.0
-      </header>
+      </header> */}
       <main>
           <Cat/>
       </main>
