@@ -9,7 +9,7 @@ import Stats from 'three/examples/jsm/libs/stats.module'
 
 
 let container;
-let camera, scene, renderer;
+let camera, scene, renderer, objCat;
 scene = new THREE.Scene();
 camera = new THREE.PerspectiveCamera( 75, window.innerWidth/ window.innerHeight, 1, 1000 );
 //CAMERA
@@ -22,7 +22,7 @@ scene.background = new THREE.Color('black');
 const light = new THREE.PointLight()
 light.position.set(2, 8, 50)
 scene.add(light)
-const ambientLight = new THREE.AmbientLight( 0xFFFFFF, 0.7);
+const ambientLight = new THREE.AmbientLight( 0xFFFFFF, 0.07);
 scene.add( ambientLight );
 
 scene.add( camera );
@@ -37,6 +37,7 @@ scene.add( axesHelper );
 
 // manager
 const loadingManager = new THREE.LoadingManager();
+
 //OBJECT LOADER
 const objloader = new OBJLoader(loadingManager);
 objloader.load(Cat, ( obj ) => {
@@ -55,8 +56,14 @@ objloader.load(Cat, ( obj ) => {
         }
     });
     //add CAT object to scene
+    objCat = object;
     scene.add(object);
+    animate();
+    
 });
+
+//FOG
+ scene.fog = new THREE.Fog( 0x23272a, 0.5, 1700, 4000 );
 
 //RENDERER
 renderer = new THREE.WebGLRenderer();
@@ -71,19 +78,22 @@ function render() {
 //STATS
 const stats = Stats();
 document.body.appendChild(stats.dom);
-var angle = 90;
+// var angle = 90;
 // var radius = 100; 
 
 function animate() {
 
     requestAnimationFrame( animate );
-    camera.position.x = Math.cos( angle );  
-    camera.position.y = Math.sin( angle );
-    angle += 0.001;
+    objCat.rotation.x += 0.001;
+	objCat.rotation.y += 0.001;
+    
+    //handles speed
+    //angle += 0.001;
 
     stats.update()
     render();
 
 }
-animate();
+
+
 export default animate;

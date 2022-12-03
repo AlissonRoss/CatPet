@@ -40,7 +40,7 @@
 }
 .footer{
   position: fixed;
-  background-color: transparent;
+  background-color: #000000;
   left:0;
   bottom:0;
   right:0;
