@@ -1,9 +1,9 @@
 
 import * as THREE from 'three';
 // import { Loader } from 'three';
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
-import Cat from '../src/assets/cat.obj';
-import Texture from '../src/assets/texture.png';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import Cat from '../src/assets/blackcat.glb';
+// import Texture from '../src/assets/texture.png';
 import Stats from 'three/examples/jsm/libs/stats.module'
 
 
@@ -13,11 +13,11 @@ let camera, scene, renderer, objCat;
 scene = new THREE.Scene();
 camera = new THREE.PerspectiveCamera( 75, window.innerWidth/ window.innerHeight, 1, 1000 );
 //CAMERA
-camera.position.z = 10;
+camera.position.z = 3;
 camera.lookAt( scene.position );
 
 // scene
-scene.background = new THREE.Color('black');
+scene.background = new THREE.Color(0x900C3F);
 //LIGHTING
 const light = new THREE.PointLight()
 light.position.set(2, 8, 50)
@@ -39,22 +39,19 @@ scene.add( axesHelper );
 const loadingManager = new THREE.LoadingManager();
 
 //OBJECT LOADER
-const objloader = new OBJLoader(loadingManager);
-objloader.load(Cat, ( obj ) => {
+const objloader = new GLTFLoader(loadingManager);
+objloader.load(Cat, ( gltf ) => {
 
-    const object = obj;
-    object.rotation.x += Math.PI/100;
-    object.position.y += Math.PI/100;
-
+    const object = gltf.scene;
     //TEXTURE LOADER
 
-    const textureLoader = new THREE.TextureLoader(loadingManager);
-    const texture = textureLoader.load(Texture);
-    object.traverse(function (child) {   // aka setTexture
-        if (child instanceof THREE.Mesh) {
-            child.material.map = texture;
-        }
-    });
+    // const textureLoader = new THREE.TextureLoader(loadingManager);
+    // const texture = textureLoader.load(Texture);
+    // // object.traverse(function (child) {   // aka setTexture
+    // //     if (child instanceof THREE.Mesh) {
+    // //         child.material.map = texture;
+    // //     }
+    // // });
     //add CAT object to scene
     objCat = object;
     scene.add(object);
