@@ -11,9 +11,9 @@ import Stats from 'three/examples/jsm/libs/stats.module'
 let container;
 let camera, scene, renderer, objCat;
 scene = new THREE.Scene();
-camera = new THREE.PerspectiveCamera( 75, window.innerWidth/ window.innerHeight, 1, 1000 );
+camera = new THREE.PerspectiveCamera( 45, window.innerWidth/ window.innerHeight, 0.1, 1000 );
 //CAMERA
-camera.position.z = 3;
+camera.position.set(-1, 1, 3);
 camera.lookAt( scene.position );
 
 // scene
@@ -27,9 +27,10 @@ scene.add( ambientLight );
 
 scene.add( camera );
 //X - PLANE
-const geometry = new THREE.PlaneGeometry( 10, 0.1 );
+const geometry = new THREE.PlaneGeometry( 1, 2 );
 const material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
 const plane = new THREE.Mesh( geometry, material );
+plane.position.set(1, 0, 0);
 scene.add( plane );
 //AXIS HELPER
 const axesHelper = new THREE.AxesHelper( 5 );
