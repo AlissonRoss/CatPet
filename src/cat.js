@@ -55,7 +55,7 @@ objloader.load(Cat, ( gltf ) => {
     //add CAT object to scene
     objCat = object;
     scene.add(object);
-    animate();
+    
     
 });
 
@@ -80,9 +80,11 @@ document.body.appendChild(stats.dom);
 
 function animate() {
 
-    requestAnimationFrame( animate );
-    objCat.rotation.x += 0.001;
-	objCat.rotation.y += 0.001;
+    setTimeout( () => {
+        requestAnimationFrame( animate );
+    }, 1000 / 60 );
+    objCat.rotation.x += 0.01;
+	objCat.rotation.y += 0.01;
     
     //handles speed
     //angle += 0.001;
@@ -91,6 +93,6 @@ function animate() {
     render();
 
 }
-
+animate();
 
 export default animate;
