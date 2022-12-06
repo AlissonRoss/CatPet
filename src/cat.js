@@ -26,12 +26,7 @@ const ambientLight = new THREE.AmbientLight( 0xfffff0, 0.2);
 scene.add( ambientLight );
 
 scene.add( camera );
-//X - PLANE
-const geometry = new THREE.PlaneGeometry( 1, 2 );
-const material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
-const plane = new THREE.Mesh( geometry, material );
-plane.position.set(1, 0, 0);
-scene.add( plane );
+
 //AXIS HELPER
 const axesHelper = new THREE.AxesHelper( 5 );
 scene.add( axesHelper );
@@ -63,7 +58,16 @@ objloader.load(Cat, ( gltf ) => {
 //FOG
  scene.fog = new THREE.Fog( 0x23272a, 0.5, 1700, 4000 );
 
- 
+ //PLANE
+const plane = new THREE.Mesh(
+    new THREE.PlaneGeometry( 40, 40 ),
+    new THREE.MeshPhongMaterial( { color: 0x097969, specular: 0x101010 } )
+);
+plane.rotation.x = - Math.PI / 2;
+plane.position.y = - 0.5;
+scene.add( plane );
+
+plane.receiveShadow = true;
 
 
 //RENDERER
@@ -71,7 +75,7 @@ renderer = new THREE.WebGLRenderer();
 container = renderer.domElement;
 renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight - 100);
-renderer.setClearColor( 0xffffff, 1);
+// renderer.setClearColor( 0xffffff, 1);
 document.body.appendChild( container );
 function render() {
     
