@@ -54,7 +54,15 @@ objloader.load(Cat, ( gltf ) => {
     
     
 });
-
+//DONUT
+const geometry = new THREE.TorusGeometry(3,1,5,40,7);
+const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+const torus = new THREE.Mesh( geometry, material );
+torus.scale.set(0.01,0.01,0.01);
+// torus.position.set(
+//     Math.random()*8 - 4
+//   );
+scene.add( torus );
 //FOG
  scene.fog = new THREE.Fog( 0x23272a, 0.5, 1700, 4000 );
 
@@ -64,7 +72,7 @@ const plane = new THREE.Mesh(
     new THREE.MeshPhongMaterial( { color: 0x097969, specular: 0x101010 } )
 );
 plane.rotation.x = - Math.PI / 2;
-plane.position.y = - 0.5;
+plane.position.y = - 0.3;
 scene.add( plane );
 
 plane.receiveShadow = true;
@@ -103,20 +111,30 @@ document.body.appendChild(stats.dom);
 
  controls.maxPolarAngle = Math.PI / 2;
 
-
-
-
-
+//Bouncing PARAMETERS AND CALC
+let acceleration = 9.8;
+let bounce_distance = 2;
+let bottom_position_y = -0.3;
+let time_step = 0.02;
+let time_counter = Math.sqrt(bounce_distance * 2 / acceleration);
+let initial_speed = acceleration * time_counter;
 function animate() {
 
     setTimeout( () => {
         requestAnimationFrame( animate );
     }, 1000 / 60 );
+
+    if (torus.position.y < bottom_position_y && objCat.position.y < bottom_position_y) {
+        time_counter = 0;
+    }
+    // s2 = s1 + ut + (1/2)gt*t formula
+    //UNIFORMLY ACCELERATED MOTION for BOUNCE
+    torus.position.y = bottom_position_y + initial_speed * time_counter - 0.6 * acceleration * time_counter * time_counter;
+    objCat.position.y = bottom_position_y + initial_speed * time_counter - 0.4 * acceleration * time_counter * time_counter;
+    time_counter += time_step;
+    
     objCat.rotation.x += 0.01;
 	objCat.rotation.y += 0.01;
-    
-    //handles speed
-    //angle += 0.001;
 
     stats.update()
     render();
