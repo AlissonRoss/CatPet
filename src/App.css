@@ -32,14 +32,12 @@
   background-color: #282c34;
   max-height: 10vh;
 }
-.canvas{
+.Cat{
   position: absolute;
-  display: flex;
-  min-width: 100vw;
-  min-height: 100vh;
 }
 .footer{
-  position: fixed;
+  position: absolute;
+  color: white;
   background-color: #000000;
   left:0;
   bottom:0;

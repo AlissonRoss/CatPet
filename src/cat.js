@@ -9,7 +9,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 
 let container;
-let camera, scene, renderer, objCat, controls;
+let camera, scene, renderer, controls;
+let objCat = Cat;
 scene = new THREE.Scene();
 camera = new THREE.PerspectiveCamera( 45, window.innerWidth/ window.innerHeight, 0.1, 1000 );
 //CAMERA
@@ -35,25 +36,29 @@ scene.add( axesHelper );
 const loadingManager = new THREE.LoadingManager();
 
 //OBJECT LOADER
-const objloader = new GLTFLoader(loadingManager);
-objloader.load(Cat, ( gltf ) => {
-
-    const object = gltf.scene;
-    //TEXTURE LOADER
-
-    // const textureLoader = new THREE.TextureLoader(loadingManager);
-    // const texture = textureLoader.load(Texture);
-    // // object.traverse(function (child) {   // aka setTexture
-    // //     if (child instanceof THREE.Mesh) {
-    // //         child.material.map = texture;
-    // //     }
-    // // });
-    //add CAT object to scene
-    objCat = object;
-    scene.add(object);
+//LOADS THIS FIRST TO AVOID ERRORS
+function init(){
+    const objloader = new GLTFLoader(loadingManager);
+    objloader.load(Cat, ( gltf ) => {
     
+        const object = gltf.scene;
+        //TEXTURE LOADER
     
-});
+        // const textureLoader = new THREE.TextureLoader(loadingManager);
+        // const texture = textureLoader.load(Texture);
+        // // object.traverse(function (child) {   // aka setTexture
+        // //     if (child instanceof THREE.Mesh) {
+        // //         child.material.map = texture;
+        // //     }
+        // // });
+        //add CAT object to scene
+        objCat = object;
+        objCat.position.set(0.5,1,1);
+        scene.add(objCat);  
+        animate();
+    });
+}
+
 //DONUT
 const geometry = new THREE.TorusGeometry(3,1,5,40,7);
 const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
@@ -114,32 +119,37 @@ document.body.appendChild(stats.dom);
 //Bouncing PARAMETERS AND CALC
 let acceleration = 9.8;
 let bounce_distance = 2;
-let bottom_position_y = -0.3;
-let time_step = 0.02;
+let bottom_position_y = -0.4;
+let time_step = 0.009;
 let time_counter = Math.sqrt(bounce_distance * 2 / acceleration);
 let initial_speed = acceleration * time_counter;
-function animate() {
 
+function animate() {
+    
     setTimeout( () => {
         requestAnimationFrame( animate );
     }, 1000 / 60 );
-
-    if (torus.position.y < bottom_position_y && objCat.position.y < bottom_position_y) {
-        time_counter = 0;
-    }
-    // s2 = s1 + ut + (1/2)gt*t formula
-    //UNIFORMLY ACCELERATED MOTION for BOUNCE
-    torus.position.y = bottom_position_y + initial_speed * time_counter - 0.6 * acceleration * time_counter * time_counter;
-    objCat.position.y = bottom_position_y + initial_speed * time_counter - 0.4 * acceleration * time_counter * time_counter;
-    time_counter += time_step;
+    if(objCat && torus){
+        if (torus.position.y < bottom_position_y && objCat.position.y < bottom_position_y) {
+            time_counter = 0;
+        }
+        // s2 = s1 + ut + (1/2)gt*t formula
+        //UNIFORMLY ACCELERATED MOTION for BOUNCE
+        let bounce = bottom_position_y + initial_speed * time_counter - 0.4 * acceleration * time_counter * time_counter;
+        torus.position.y = bounce;
+        objCat.position.y = bounce;
+        
+        objCat.rotation.x += 0.01;
+        objCat.rotation.y += 0.01;
+        objCat.rotation.y += 0.01;
     
-    objCat.rotation.x += 0.01;
-	objCat.rotation.y += 0.01;
+        time_counter += time_step;
+    }  
+   
 
     stats.update()
     render();
 
 }
-animate();
 
-export default animate;
+export default init;
