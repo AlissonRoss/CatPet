@@ -2,7 +2,8 @@
 import * as THREE from 'three';
 // import { Loader } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import Cat from '../src/assets/blackcat.glb';
+import BlackCat from '../src/assets/blackcat.glb';
+import OrangeCat from '../src/assets/orangecat.glb';
 // import Texture from '../src/assets/texture.png';
 import Stats from 'three/examples/jsm/libs/stats.module'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -10,7 +11,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 let container;
 let camera, scene, renderer, controls;
-let objCat = Cat;
+let objBlackCat = BlackCat;
+let objOrangeCat = OrangeCat;
 scene = new THREE.Scene();
 camera = new THREE.PerspectiveCamera( 45, window.innerWidth/ window.innerHeight, 0.1, 1000 );
 //CAMERA
@@ -31,30 +33,27 @@ scene.add( camera );
 //AXIS HELPER
 const axesHelper = new THREE.AxesHelper( 5 );
 scene.add( axesHelper );
-
-// manager
-const loadingManager = new THREE.LoadingManager();
-
-//OBJECT LOADER
+//PROMISE
+const loader = new GLTFLoader();
+const loadAsync = url => {
+    return new Promise(resolve => {
+      loader.load(url, gltf => {
+        resolve(gltf)
+      })
+    })
+  }
 //LOADS THIS FIRST TO AVOID ERRORS
 function init(){
-    const objloader = new GLTFLoader(loadingManager);
-    objloader.load(Cat, ( gltf ) => {
-    
-        const object = gltf.scene;
-        //TEXTURE LOADER
-    
-        // const textureLoader = new THREE.TextureLoader(loadingManager);
-        // const texture = textureLoader.load(Texture);
-        // // object.traverse(function (child) {   // aka setTexture
-        // //     if (child instanceof THREE.Mesh) {
-        // //         child.material.map = texture;
-        // //     }
-        // // });
-        //add CAT object to scene
-        objCat = object;
-        objCat.position.set(0.5,1,1);
-        scene.add(objCat);  
+    Promise.all([loadAsync(BlackCat), loadAsync(OrangeCat)]).then(models => {
+        //LOAD BLACK CAT
+        objBlackCat = models[0].scene.children[0];
+        objBlackCat.position.set(0.5,1,1);
+        scene.add(objBlackCat); 
+        
+        //LOAD ORANGE CAT
+        objOrangeCat = models[1].scene.children[0];
+        objOrangeCat.position.set(-0.5,-1,-1);
+        scene.add(objOrangeCat);  
         animate();
     });
 }
@@ -97,8 +96,6 @@ function render() {
 //STATS
 const stats = Stats();
 document.body.appendChild(stats.dom);
-// var angle = 90;
-// var radius = 100; 
 
 //CONTROLS
  controls = new OrbitControls( camera, renderer.domElement );
@@ -106,11 +103,9 @@ document.body.appendChild(stats.dom);
 
  //controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
 
- controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+ controls.enableDamping = true; 
  controls.dampingFactor = 0.05;
-
  controls.screenSpacePanning = false;
-
  controls.minDistance = 1;
  controls.maxDistance = 5;
 
@@ -128,20 +123,25 @@ function animate() {
     
     setTimeout( () => {
         requestAnimationFrame( animate );
-    }, 1000 / 60 );
-    if(objCat && torus){
-        if (torus.position.y < bottom_position_y && objCat.position.y < bottom_position_y) {
+    }, 1000 / 100 );
+    if(objBlackCat && torus && objOrangeCat){
+        if (torus.position.y < bottom_position_y && objBlackCat.position.y < bottom_position_y && objOrangeCat.position.y < bottom_position_y) {
             time_counter = 0;
         }
         // s2 = s1 + ut + (1/2)gt*t formula
         //UNIFORMLY ACCELERATED MOTION for BOUNCE
         let bounce = bottom_position_y + initial_speed * time_counter - 0.4 * acceleration * time_counter * time_counter;
         torus.position.y = bounce;
-        objCat.position.y = bounce;
+        objBlackCat.position.y = bounce;
+        objOrangeCat.position.y = bounce;
         
-        objCat.rotation.x += 0.01;
-        objCat.rotation.y += 0.01;
-        objCat.rotation.y += 0.01;
+        objBlackCat.rotation.x += 0.01;
+        objBlackCat.rotation.y += 0.01;
+        objBlackCat.rotation.y += 0.01;
+
+        objOrangeCat.rotation.x -= 0.01;
+        objOrangeCat.rotation.y -= 0.01;
+        objOrangeCat.rotation.y -= 0.01;
     
         time_counter += time_step;
     }  
