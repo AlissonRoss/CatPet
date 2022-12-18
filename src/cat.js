@@ -13,10 +13,11 @@ let container;
 let camera, scene, renderer, controls;
 let objBlackCat = BlackCat;
 let objOrangeCat = OrangeCat;
+let wasInitCalled = false;
 scene = new THREE.Scene();
 camera = new THREE.PerspectiveCamera( 45, window.innerWidth/ window.innerHeight, 0.1, 1000 );
 //CAMERA
-camera.position.set(-1, 1, 3);
+camera.position.set(-1, 1, 5);
 camera.lookAt( scene.position );
 
 // scene
@@ -44,18 +45,26 @@ const loadAsync = url => {
   }
 //LOADS THIS FIRST TO AVOID ERRORS
 function init(){
-    Promise.all([loadAsync(BlackCat), loadAsync(OrangeCat)]).then(models => {
-        //LOAD BLACK CAT
-        objBlackCat = models[0].scene.children[0];
-        objBlackCat.position.set(0.5,1,1);
-        scene.add(objBlackCat); 
-        
-        //LOAD ORANGE CAT
-        objOrangeCat = models[1].scene.children[0];
-        objOrangeCat.position.set(-0.5,-1,-1);
-        scene.add(objOrangeCat);  
-        animate();
-    });
+
+    // ignore the 2nd call to init
+    if (!wasInitCalled)
+    {
+        wasInitCalled = true;
+
+        Promise.all([loadAsync(BlackCat), loadAsync(OrangeCat)]).then(models => {
+            //LOAD BLACK CAT
+            objBlackCat = models[0].scene.children[0];
+            objBlackCat.position.set(0.5,1,1);
+            scene.add(objBlackCat); 
+            
+            //LOAD ORANGE CAT
+            objOrangeCat = models[1].scene.children[0];
+            objOrangeCat.position.set(-0.5,-1,-1);
+            scene.add(objOrangeCat);
+            animate();
+        });
+
+    }
 }
 
 //DONUT
@@ -114,16 +123,13 @@ document.body.appendChild(stats.dom);
 //Bouncing PARAMETERS AND CALC
 let acceleration = 9.8;
 let bounce_distance = 2;
-let bottom_position_y = -0.4;
+let bottom_position_y = 0;
 let time_step = 0.009;
 let time_counter = Math.sqrt(bounce_distance * 2 / acceleration);
 let initial_speed = acceleration * time_counter;
 
-function animate() {
-    
-    setTimeout( () => {
-        requestAnimationFrame( animate );
-    }, 1000 / 100 );
+function animate()
+{    
     if(objBlackCat && torus && objOrangeCat){
         if (torus.position.y < bottom_position_y && objBlackCat.position.y < bottom_position_y && objOrangeCat.position.y < bottom_position_y) {
             time_counter = 0;
@@ -142,7 +148,6 @@ function animate() {
         objOrangeCat.rotation.x -= 0.01;
         objOrangeCat.rotation.y -= 0.01;
         objOrangeCat.rotation.y -= 0.01;
-    
         time_counter += time_step;
     }  
    
@@ -150,6 +155,8 @@ function animate() {
     stats.update()
     render();
 
+    // request another frame render as soon as the previous one finishes
+    requestAnimationFrame( animate );
 }
 
 export default init;
