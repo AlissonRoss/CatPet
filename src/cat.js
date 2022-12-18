@@ -130,26 +130,24 @@ let initial_speed = acceleration * time_counter;
 
 function animate()
 {    
-    if(objBlackCat && torus && objOrangeCat){
-        if (torus.position.y < bottom_position_y && objBlackCat.position.y < bottom_position_y && objOrangeCat.position.y < bottom_position_y) {
-            time_counter = 0;
-        }
-        // s2 = s1 + ut + (1/2)gt*t formula
-        //UNIFORMLY ACCELERATED MOTION for BOUNCE
-        let bounce = bottom_position_y + initial_speed * time_counter - 0.4 * acceleration * time_counter * time_counter;
-        torus.position.y = bounce;
-        objBlackCat.position.y = bounce;
-        objOrangeCat.position.y = bounce;
-        
-        objBlackCat.rotation.x += 0.01;
-        objBlackCat.rotation.y += 0.01;
-        objBlackCat.rotation.y += 0.01;
+    if (torus.position.y < bottom_position_y && objBlackCat.position.y < bottom_position_y && objOrangeCat.position.y < bottom_position_y) {
+        time_counter = 0;
+    }
+    // s2 = s1 + ut + (1/2)gt*t formula
+    //UNIFORMLY ACCELERATED MOTION for BOUNCE
+    let bounce = bottom_position_y + initial_speed * time_counter - 0.4 * acceleration * time_counter * time_counter;
+    torus.position.y = bounce;
+    objBlackCat.position.y = bounce;
+    objOrangeCat.position.y = bounce;
+    
+    objBlackCat.rotation.x += 0.01;
+    objBlackCat.rotation.y += 0.01;
+    objBlackCat.rotation.y += 0.01;
 
-        objOrangeCat.rotation.x -= 0.01;
-        objOrangeCat.rotation.y -= 0.01;
-        objOrangeCat.rotation.y -= 0.01;
-        time_counter += time_step;
-    }  
+    objOrangeCat.rotation.x -= 0.01;
+    objOrangeCat.rotation.y -= 0.01;
+    objOrangeCat.rotation.y -= 0.01;
+    time_counter += time_step;
    
 
     stats.update()
