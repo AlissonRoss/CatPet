@@ -10,7 +10,7 @@ function App() {
         CatPet v 0.0
       </header> */}
       <main>
-          <Cat style={{width:"inherit", height:"inherit", position:"absolute"}}/>
+          <Cat style={{ position:"absolute"}}/>
       </main>
       <footer>
           Thanks for checking out my ThreeJS Testbed!

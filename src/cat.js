@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import BlackCat from '../src/assets/blackcat.glb';
 import OrangeCat from '../src/assets/orangecat.glb';
+import madi from '../src/assets/madi.glb';
 // import Texture from '../src/assets/texture.png';
 import Stats from 'three/examples/jsm/libs/stats.module'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -13,6 +14,7 @@ let container;
 let camera, scene, renderer, controls;
 let objBlackCat = BlackCat;
 let objOrangeCat = OrangeCat;
+let objmadi = madi;
 let wasInitCalled = false;
 scene = new THREE.Scene();
 camera = new THREE.PerspectiveCamera( 45, window.innerWidth/ window.innerHeight, 0.1, 1000 );
@@ -51,7 +53,7 @@ function init(){
     {
         wasInitCalled = true;
 
-        Promise.all([loadAsync(BlackCat), loadAsync(OrangeCat)]).then(models => {
+        Promise.all([loadAsync(BlackCat), loadAsync(OrangeCat), loadAsync(madi)]).then(models => {
             //LOAD BLACK CAT
             objBlackCat = models[0].scene.children[0];
             objBlackCat.position.set(0.5,1,1);
@@ -61,6 +63,13 @@ function init(){
             objOrangeCat = models[1].scene.children[0];
             objOrangeCat.position.set(-0.5,-1,-1);
             scene.add(objOrangeCat);
+
+            //LOAD madi
+            objmadi = models[2].scene.children[0];
+            objmadi.position.set(-0.2,0.5,0);
+            objmadi.rotation.y += 1;
+            scene.add(objmadi);
+
             animate();
         });
 
@@ -95,7 +104,7 @@ plane.receiveShadow = true;
 renderer = new THREE.WebGLRenderer();
 container = renderer.domElement;
 renderer.setPixelRatio( window.devicePixelRatio );
-renderer.setSize( window.innerWidth, window.innerHeight - 100);
+renderer.setSize( window.innerWidth, window.innerHeight);
 // renderer.setClearColor( 0xffffff, 1);
 document.body.appendChild( container );
 function render() {
