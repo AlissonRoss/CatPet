@@ -8,6 +8,8 @@ import madi from '../src/assets/madi.glb';
 // import Texture from '../src/assets/texture.png';
 import Stats from 'three/examples/jsm/libs/stats.module'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import BgImg from '../src/assets/sky.png';
+let c = document.querySelector('#canvas');
 
 
 let container;
@@ -16,16 +18,18 @@ let objBlackCat = BlackCat;
 let objOrangeCat = OrangeCat;
 let objmadi = madi;
 let wasInitCalled = false;
+//SCENE
 scene = new THREE.Scene();
-camera = new THREE.PerspectiveCamera( 45, window.innerWidth/ window.innerHeight, 0.1, 1000 );
+
 //CAMERA
+camera = new THREE.PerspectiveCamera( 45, window.innerWidth/ window.innerHeight, 0.1, 1000 );
 camera.position.set(-1, 1, 5);
 camera.lookAt( scene.position );
 
-// scene
-scene.background = new THREE.Color(0x000000);
+
+
 //LIGHTING
-const light = new THREE.PointLight()
+const light = new THREE.PointLight(0xffffff, 1, Infinity)
 light.position.set(-1, 1, 3)
 scene.add(light)
 const ambientLight = new THREE.AmbientLight( 0xfffff0, 0.2);
@@ -36,6 +40,13 @@ scene.add( camera );
 //AXIS HELPER
 const axesHelper = new THREE.AxesHelper( 5 );
 scene.add( axesHelper );
+//RESIZE
+function onWindowResize() {
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
 //PROMISE
 const loader = new GLTFLoader();
 const loadAsync = url => {
@@ -45,6 +56,10 @@ const loadAsync = url => {
       })
     })
   }
+const BgLoader = new THREE.TextureLoader();
+const bgTexture = BgLoader.load(BgImg);
+BgLoader.crossOrigin = "";
+scene.background = bgTexture;
 //LOADS THIS FIRST TO AVOID ERRORS
 function init(){
 
@@ -69,7 +84,8 @@ function init(){
             objmadi.position.set(-0.2,0.5,0);
             objmadi.rotation.y += 1;
             scene.add(objmadi);
-
+            //RESIZES WINDOW
+            window.addEventListener('resize', onWindowResize, false);
             animate();
         });
 
@@ -101,7 +117,8 @@ plane.receiveShadow = true;
 
 
 //RENDERER
-renderer = new THREE.WebGLRenderer();
+renderer = new THREE.WebGLRenderer({c, alpha: true});
+renderer.autoClearColor = false;
 container = renderer.domElement;
 renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight);
@@ -111,6 +128,8 @@ function render() {
     
     renderer.render( scene, camera );
 } 
+
+  
 //STATS
 const stats = Stats();
 document.body.appendChild(stats.dom);
@@ -131,7 +150,7 @@ document.body.appendChild(stats.dom);
 
 //Bouncing PARAMETERS AND CALC
 let acceleration = 9.8;
-let bounce_distance = 2;
+let bounce_distance = 1;
 let bottom_position_y = 0;
 let time_step = 0.009;
 let time_counter = Math.sqrt(bounce_distance * 2 / acceleration);

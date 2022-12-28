@@ -40,6 +40,11 @@
   display: grid;
   position: absolute;
 }
+
+#c{
+  background: url("../src/assets/sky.png") no-repeat center center;
+  background-size: cover;
+}
 .footer{
   position: absolute;
   color: white;
