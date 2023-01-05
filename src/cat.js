@@ -92,15 +92,7 @@ function init(){
     }
 }
 
-//DONUT
-const geometry = new THREE.TorusGeometry(3,1,5,40,7);
-const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-const torus = new THREE.Mesh( geometry, material );
-torus.scale.set(0.01,0.01,0.01);
-// torus.position.set(
-//     Math.random()*8 - 4
-//   );
-scene.add( torus );
+
 //FOG
  scene.fog = new THREE.Fog( 0x23272a, 0.5, 1700, 4000 );
 
@@ -158,13 +150,13 @@ let initial_speed = acceleration * time_counter;
 
 function animate()
 {    
-    if (torus.position.y < bottom_position_y && objBlackCat.position.y < bottom_position_y && objOrangeCat.position.y < bottom_position_y) {
+    if (objBlackCat.position.y < bottom_position_y && objOrangeCat.position.y < bottom_position_y) {
         time_counter = 0;
     }
     // s2 = s1 + ut + (1/2)gt*t formula
     //UNIFORMLY ACCELERATED MOTION for BOUNCE
     let bounce = bottom_position_y + initial_speed * time_counter - 0.4 * acceleration * time_counter * time_counter;
-    torus.position.y = bounce;
+    
     objBlackCat.position.y = bounce;
     objOrangeCat.position.y = bounce;
     
@@ -183,6 +175,16 @@ function animate()
 
     // request another frame render as soon as the previous one finishes
     requestAnimationFrame( animate );
+}
+
+export function addDonut(){
+    const geometry = new THREE.TorusGeometry(3,1,5,40,7);
+    const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+    const torus = new THREE.Mesh( geometry, material );
+    torus.scale.set(0.01,0.01,0.01);
+    torus.position.set(Math.random(50), Math.random(20), Math.random(50));
+    scene.add( torus );
+    // torus.position.y = bounce;
 }
 
 export default init;

@@ -1,6 +1,6 @@
 
 import './App.css';
-import Cat from './cat.js';
+import Cat, {addDonut} from './cat.js';
 import { Button } from '@mui/material';
 
 function App() {
@@ -14,7 +14,7 @@ function App() {
           <br/>
           <Button variant="contained" style={{ margin:"1em"}}
            onClick={() => {
-            alert('clicked');
+            addDonut();
           }}
           >Donuts</Button>
     </div>
