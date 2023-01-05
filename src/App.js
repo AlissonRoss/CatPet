@@ -1,7 +1,7 @@
 
 import './App.css';
 import Cat from './cat.js';
-
+import { Button } from '@mui/material';
 
 function App() {
   return (
@@ -9,12 +9,14 @@ function App() {
       {/* <header className="App-header">
         CatPet v 0.0
       </header> */}
-      <main>
           <Cat id="c" style={{ position:"absolute"}}/>
-      </main>
-      <footer>
-          Thanks for checking out my ThreeJS Testbed!
-      </footer>
+          CatPet v.0.0
+          <br/>
+          <Button variant="contained" style={{ margin:"1em"}}
+           onClick={() => {
+            alert('clicked');
+          }}
+          >Donuts</Button>
     </div>
   );
 }
