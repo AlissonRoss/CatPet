@@ -5,6 +5,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import BlackCat from '../src/assets/blackcat.glb';
 import OrangeCat from '../src/assets/orangecat.glb';
 import madi from '../src/assets/madi.glb';
+import Ivy from '../src/assets/ivy.glb';
 // import Texture from '../src/assets/texture.png';
 import Stats from 'three/examples/jsm/libs/stats.module'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -17,6 +18,7 @@ let camera, scene, renderer, controls;
 let objBlackCat = BlackCat;
 let objOrangeCat = OrangeCat;
 let objmadi = madi;
+let objIvy = Ivy;
 let wasInitCalled = false;
 //SCENE
 scene = new THREE.Scene();
@@ -29,10 +31,10 @@ camera.lookAt( scene.position );
 
 
 //LIGHTING
-const light = new THREE.PointLight(0xffffff, 1, Infinity)
-light.position.set(-1, 1, 3)
+const light = new THREE.PointLight(0xFFFFFF, 1, Infinity)
+light.position.set(-1, 0.5, 4)
 scene.add(light)
-const ambientLight = new THREE.AmbientLight( 0xfffff0, 0.2);
+const ambientLight = new THREE.AmbientLight( 0xCCCCC0, 0.6);
 scene.add( ambientLight );
 
 scene.add( camera );
@@ -68,7 +70,8 @@ function init(){
     {
         wasInitCalled = true;
 
-        Promise.all([loadAsync(BlackCat), loadAsync(OrangeCat), loadAsync(madi)]).then(models => {
+        Promise.all([loadAsync(BlackCat), loadAsync(OrangeCat), 
+            loadAsync(madi), loadAsync(objIvy)]).then(models => {
             //LOAD BLACK CAT
             objBlackCat = models[0].scene.children[0];
             objBlackCat.position.set(0.5,1,1);
@@ -76,14 +79,21 @@ function init(){
             
             //LOAD ORANGE CAT
             objOrangeCat = models[1].scene.children[0];
-            objOrangeCat.position.set(-0.5,-1,-1);
+            objOrangeCat.position.set(-0.5,1,1);
             scene.add(objOrangeCat);
 
             //LOAD madi
             objmadi = models[2].scene.children[0];
-            objmadi.position.set(-0.2,0.5,0);
+            objmadi.position.set(0.2,0.5,0);
             objmadi.rotation.y += 1;
             scene.add(objmadi);
+
+            //LOAD IVY MODEL
+            objIvy = models[3].scene.children[0];
+            objIvy.position.set(-0.2,0.5,0);
+            objIvy.rotation.y -= 1;
+            scene.add(objIvy);
+
             //RESIZES WINDOW
             window.addEventListener('resize', onWindowResize, false);
             animate();
@@ -144,22 +154,15 @@ document.body.appendChild(stats.dom);
 let acceleration = 9.8;
 let bounce_distance = 1;
 let bottom_position_y = 0;
-let time_step = 0.009;
+let time_step = 0.09;
 let time_counter = Math.sqrt(bounce_distance * 2 / acceleration);
 let initial_speed = acceleration * time_counter;
 
+//ANIMATE FUNCTION
 function animate()
-{    
-    if (objBlackCat.position.y < bottom_position_y && objOrangeCat.position.y < bottom_position_y) {
-        time_counter = 0;
-    }
-    // s2 = s1 + ut + (1/2)gt*t formula
-    //UNIFORMLY ACCELERATED MOTION for BOUNCE
-    let bounce = bottom_position_y + initial_speed * time_counter - 0.4 * acceleration * time_counter * time_counter;
-    
-    objBlackCat.position.y = bounce;
-    objOrangeCat.position.y = bounce;
-    
+{
+    stats.update()
+    render();
     objBlackCat.rotation.x += 0.01;
     objBlackCat.rotation.y += 0.01;
     objBlackCat.rotation.y += 0.01;
@@ -167,16 +170,28 @@ function animate()
     objOrangeCat.rotation.x -= 0.01;
     objOrangeCat.rotation.y -= 0.01;
     objOrangeCat.rotation.y -= 0.01;
-    time_counter += time_step;
-   
-
-    stats.update()
-    render();
-
     // request another frame render as soon as the previous one finishes
     requestAnimationFrame( animate );
 }
-
+//BOUNCE MODELS
+export function bounce() {
+   
+    while(time_counter > 0){
+        if (objBlackCat.position.y < bottom_position_y && objOrangeCat.position.y < bottom_position_y) {
+            time_counter = 0;
+        }
+            // s2 = s1 + ut + (1/2)gt*t formula
+        //UNIFORMLY ACCELERATED MOTION for BOUNCE
+        let bounce = bottom_position_y + initial_speed * time_counter - 0.4 * acceleration * time_counter * time_counter;
+        
+        objBlackCat.position.y = bounce;
+        objOrangeCat.position.y = bounce;
+        time_counter += time_step;
+        requestAnimationFrame( bounce );
+    } 
+    
+}
+//ADD TORUS
 export function addDonut(){
     const geometry = new THREE.TorusGeometry(3,1,5,40,7);
     const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
