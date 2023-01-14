@@ -16,7 +16,10 @@ const canvas = document.querySelector('#canvas');
 
 let renderer;
 let wasInitCalled = false;  // A bug in the React code causes the init() function to be called twice. Ingore calls after the first
+let prevRenderTimeStamp = 0;  // store the time that the last frame was rendered so we can calculate elapsed time between frames
 
+// multiple instances of this module will be used, so only store it once in memory
+const torusGeometry = new THREE.TorusGeometry(3,1,5,40,7);
 
 //SCENE
 const scene = new THREE.Scene();
@@ -24,21 +27,47 @@ let objBlackCat  = null;
 let objOrangeCat = null;
 let objMadi      = null;
 let objIvy       = null;
+let objCatList   = [];    // also store all cats to a list so any common logic can happen in a loop
+let objTorusList = [];    // also store all cats to a list so any common logic can happen in a loop
 
 //CAMERA
 const camera = new THREE.PerspectiveCamera( 45, window.innerWidth/ window.innerHeight, 0.1, 1000 );
 camera.position.set(-1, 1, 5);
 camera.lookAt( scene.position );
-
-
+scene.add( camera );
 
 //LIGHTING
-const light = new THREE.PointLight(0xFFFFFF, 1, Infinity)
-light.position.set(-1, 0.5, 4)
+// bounds of shadow-casting. plane and objects must be contained inside because the shadow map is scaled to this size.
+// Any portions of the scene outside of this region will be full bright.
+// If you get an object who's shadow is disappearing, then you may need to extend these two values.
+const shadowMapWidth  = 3;
+const shadowMapHeight = 3;
+const light = new THREE.DirectionalLight(0xFFFFFF, 1);
+light.position.set(0, 5, 0); // set position of sun just above the top-most object in scene
+light.castShadow            = true;
+light.shadow.mapSize.width  = 1024;
+light.shadow.mapSize.height = 1024;
+light.shadow.bias           = -0.02;
+
+
+// bound the shadow camera such that it fits the whole scene
+light.shadow.camera = new THREE.OrthographicCamera(
+    -shadowMapWidth / 2,
+    shadowMapWidth / 2,
+    shadowMapHeight / 2,
+    -shadowMapHeight / 2,
+    0.5,                    // shadow map includes objects below light.position.y - 0.5
+    light.position.y + 0.5, // shadow map includes objects above -0.5
+);
 scene.add(light)
+
+//Create a helper for the shadow camera (optional). This visualizes the bounds where shadows are cast. Use this when choosing shadowMapWidth and shadowMapHeight
+const shadowCameraHelper = new THREE.CameraHelper( light.shadow.camera );
+shadowCameraHelper.visible = false; // invisible by default
+scene.add( shadowCameraHelper );
+
 const ambientLight = new THREE.AmbientLight( 0xCCCCC0, 0.6);
 scene.add( ambientLight );
-scene.add( camera );
 
 //AXIS HELPER
 const axesHelper = new THREE.AxesHelper( 5 );
@@ -78,27 +107,53 @@ function init(){
     wasInitCalled = true;
 
     Promise.all([loadAsync(BlackCat), loadAsync(OrangeCat), loadAsync(Madi), loadAsync(Ivy)]).then(models => {
+
+        // If a loaded file is mistakenly a scene instead of a model or is otherwise nested, then return the root 3D mesh.
+        // This is needed for correct shadow casting and model rotation behavior.
+        models = models.map(obj => {
+            if ("scene" in obj)
+            {
+                obj = obj.scene;
+            }
+
+            // The scene contains "Object 3D" objects that aren't directly meshes, and as such applies an internal model offset that stacks on obj.rotation values.
+            // Without this loop, setting obj.castShadow = true would not cause the 3D mesh inside to cast shadows.
+            while (!obj.isMesh && (obj.children.length > 0))
+            {
+                obj = obj.children[0];
+            }
+
+            return obj;
+        });
+
         //LOAD BLACK CAT
-        objBlackCat = models[0].scene.children[0];
+        objBlackCat = models[0];
         objBlackCat.position.set(0.5,1,1);
-        scene.add(objBlackCat); 
+        objCatList.push(objBlackCat);
         
         //LOAD ORANGE CAT
-        objOrangeCat = models[1].scene.children[0];
+        objOrangeCat = models[1];
         objOrangeCat.position.set(-0.5,1,1);
-        scene.add(objOrangeCat);
+        objCatList.push(objOrangeCat);
 
         //LOAD madi
-        objMadi = models[2].scene.children[0];
-        objMadi.position.set(0.2,0.5,0);
-        objMadi.rotation.y += 1;
-        scene.add(objMadi);
+        objMadi = models[2];
+        objMadi.position.set(0.2, 0.5, 0);
+        objMadi.rotation.y = -2;
+        objCatList.push(objMadi);
 
         //LOAD IVY MODEL
-        objIvy = models[3].scene.children[0];
-        objIvy.position.set(-0.2,0.5,0);
-        objIvy.rotation.y -= 1;
-        scene.add(objIvy);
+        objIvy = models[3];
+        objIvy.position.set(0.2, 1.5, 0);
+        // objIvy.rotation.y = 1;
+        objCatList.push(objIvy);
+        
+        for (let cat of objCatList)
+        {
+            cat.castShadow    = true;  // allow cats to cast shadows on the plane
+            cat.receiveShadow = true;  // allow cats to cast shadows on each other
+            scene.add(cat);
+        }
 
         //RESIZES WINDOW
         window.addEventListener('resize', onWindowResize, false);
@@ -107,6 +162,7 @@ function init(){
         onWindowResize();
         
         // Delay rendering until all models are loaded
+        prevRenderTimeStamp = performance.now();
         requestAnimationFrame(animate);
     });
 }
@@ -116,15 +172,15 @@ function init(){
 scene.fog = new THREE.Fog( 0x23272a, 0.5, 1700, 4000 );
 
  //PLANE
+ // Note that only shadowMapWidth on the x-axis and shadowMapHeight on the y-axis of this plane will receive shadow. The rest will be full bright.
 const plane = new THREE.Mesh(
     new THREE.PlaneGeometry( 40, 40 ),
     new THREE.MeshPhongMaterial( { color: 0x097969, specular: 0x101010 } )
 );
-plane.rotation.x = - Math.PI / 2;
-plane.position.y = - 0.3;
-scene.add( plane );
-
+plane.rotation.x    = -Math.PI / 2;  // rotate to move y-axis size to be along z-axis
+plane.position.y    = -0.25;  // place plane below 0 so that the orbital camera doesn't clip into it
 plane.receiveShadow = true;
+scene.add( plane );
 
 
 //RENDERER
@@ -135,6 +191,8 @@ renderer = new THREE.WebGLRenderer({
     antialias: false,
 });
 
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
 // renderer.setClearColor( 0xffffff, 1);
 document.body.appendChild( renderer.domElement );
 
@@ -146,7 +204,7 @@ let time_step = 0.09;
 let time_counter = Math.sqrt(bounce_distance * 2 / acceleration);
 let initial_speed = acceleration * time_counter;
 
-function updatePhysics()
+function updatePhysics(currentTimeInMs, deltaTimeInMs)
 {
     objBlackCat.rotation.x += 0.01;
     objBlackCat.rotation.y += 0.01;
@@ -155,6 +213,21 @@ function updatePhysics()
     objOrangeCat.rotation.x -= 0.01;
     objOrangeCat.rotation.y -= 0.01;
     objOrangeCat.rotation.y -= 0.01;
+
+    // Make Ivy and Madi orbit around each other to cast shadows on each other
+    const angle  = currentTimeInMs / 1000;
+    const radius = 0.5;
+    objIvy.position.x = Math.cos(angle) * radius;
+    objIvy.position.y = Math.sin(angle) * radius + radius;
+    objMadi.position.x = -objIvy.position.x;
+    objMadi.position.y = 2 * radius - objIvy.position.y;
+
+    for (const torus of objTorusList)
+    {
+        torus.rotation.x += 0.02;
+        torus.rotation.y += 0.01;
+        torus.rotation.z += 0.05;
+    }
 }
 
 //STATS
@@ -176,10 +249,16 @@ controls.maxDistance = 5;
 controls.maxPolarAngle = Math.PI / 2;
 
 //ANIMATE FUNCTION
-function animate()
+function animate(currentTimeInMs)
 {
+    let deltaTimeInMs = currentTimeInMs - prevRenderTimeStamp;
+    prevRenderTimeStamp = currentTimeInMs;
+
+    // Account for users leaving the tab then coming back. Cap the time delta to as if the tab is running at 30 FPS
+    deltaTimeInMs = Math.min(deltaTimeInMs, 1000 / 30);
+
     stats.update()
-    updatePhysics();
+    updatePhysics(currentTimeInMs, deltaTimeInMs);
     renderer.render( scene, camera );
 
     // request another frame render as soon as the previous one finishes
@@ -204,14 +283,33 @@ export function onBounceButtonClick()
     // } 
 }
 //ADD TORUS
-export function addDonut(){
-    const geometry = new THREE.TorusGeometry(3,1,5,40,7);
-    const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-    const torus = new THREE.Mesh( geometry, material );
+export function addDonut()
+{
+    // Bias light towards brighter colors. The `|0` casts to an integer
+    const red   = ((1 - Math.random()**2) * 255)|0;
+    const green = ((1 - Math.random()**2) * 255)|0;
+    const blue  = ((1 - Math.random()**2) * 255)|0;
+    const color = (red << 16) | (green << 8) | blue;
+
+    const x = Math.random() * 2 - 1;
+    const y = Math.random();
+    const z = Math.random() * 2 - 1;
+
+    // Note: MeshBasicMaterial does not respond to light. It is always full bright.
+    // MeshBasicMaterial can cast shadows but not receive them.
+    const material = new THREE.MeshStandardMaterial( { color: color } );
+    const torus = new THREE.Mesh( torusGeometry, material );
     torus.scale.set(0.01,0.01,0.01);
-    torus.position.set(Math.random(50), Math.random(20), Math.random(50));
+    torus.position.set(x, y, z);
+    torus.castShadow    = true;
+    torus.receiveShadow = true;
     scene.add( torus );
-    // torus.position.y = bounce;
+    objTorusList.push(torus);
+}
+
+export function onShadowMapToggleButtonClick()
+{
+    shadowCameraHelper.visible = !shadowCameraHelper.visible;
 }
 
 export default init;

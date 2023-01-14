@@ -1,6 +1,6 @@
 
 import './App.css';
-import Cat, {addDonut, onBounceButtonClick} from './cat.js';
+import Cat, {addDonut, onBounceButtonClick, onShadowMapToggleButtonClick} from './cat.js';
 import { Button } from '@mui/material';
 
 function App() {
@@ -23,6 +23,12 @@ function App() {
             onBounceButtonClick();
           }}
           >Bounce</Button>}
+
+          { <Button variant="contained" style={{ margin:"1em"}}
+           onClick={() => {
+            onShadowMapToggleButtonClick();
+          }}
+          >Toggle Shadow Map Bounds</Button>}
     </div>
   );
 }
