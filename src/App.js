@@ -1,6 +1,6 @@
 
 import './App.css';
-import Cat, {addDonut, bounce} from './cat.js';
+import Cat, {addDonut, onBounceButtonClick} from './cat.js';
 import { Button } from '@mui/material';
 
 function App() {
@@ -20,7 +20,7 @@ function App() {
 
           { <Button variant="contained" style={{ margin:"1em"}}
            onClick={() => {
-            bounce();
+            onBounceButtonClick();
           }}
           >Bounce</Button>}
     </div>
