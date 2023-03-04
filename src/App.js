@@ -18,17 +18,17 @@ function App() {
           }}
           >Donuts</Button>
 
-          { <Button variant="contained" style={{ margin:"1em"}}
+          {/* { <Button variant="contained" style={{ margin:"1em"}}
            onClick={() => {
             onBounceButtonClick();
           }}
-          >Bounce</Button>}
+          >Bounce</Button>} */}
 
-          { <Button variant="contained" style={{ margin:"1em"}}
+          {/* { <Button variant="contained" style={{ margin:"1em"}}
            onClick={() => {
             onShadowMapToggleButtonClick();
           }}
-          >Toggle Shadow Map Bounds</Button>}
+          >Toggle Shadow Map Bounds</Button>} */}
     </div>
   );
 }
