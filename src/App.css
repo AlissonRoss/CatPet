@@ -4,7 +4,7 @@
   display: absolute;
   position: fixed;
   color: white;
-  left: 90%;
+  left: 90vw;
 }
 
 .App-logo {
@@ -67,6 +67,6 @@
 
 @media screen and (max-width:850px) {
   .App{
-    left: 80vw;
+    left: 70vw;
   }
 }
