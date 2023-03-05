@@ -1,7 +1,20 @@
 
 import './App.css';
-import Cat, {addDonut, onBounceButtonClick, onShadowMapToggleButtonClick} from './cat.js';
+import Cat, {addDonut} from './cat.js';
 import { Button } from '@mui/material';
+import React, { useState } from 'react';
+
+function Increment(){
+  const [count, setCount] = useState(0);
+  return(   
+  <Button variant="contained" style={{ margin:"1em"}}
+    onClick={() => {
+      setCount(count+1)
+      addDonut();
+    }}>{count} Donuts </Button>
+  );
+}
+
 
 function App() {
   return (
@@ -12,11 +25,8 @@ function App() {
           <Cat id="c" style={{ position:"absolute"}}/>
           CatPet v.0.0
           <br/>
-          <Button variant="contained" style={{ margin:"1em"}}
-           onClick={() => {
-            addDonut();
-          }}
-          >Donuts</Button>
+          <Increment/>
+       
 
           {/* { <Button variant="contained" style={{ margin:"1em"}}
            onClick={() => {
@@ -34,3 +44,4 @@ function App() {
 }
 
 export default App;
+
