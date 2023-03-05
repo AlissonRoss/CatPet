@@ -306,6 +306,15 @@ export function addDonut()
     scene.add( torus );
     objTorusList.push(torus);
 }
+export function decrementCatSize(){
+    objIvy.scale.multiplyScalar(0.95);
+    console.log(objIvy.scale.length());
+}
+
+export function incrementCatSize(){
+    objIvy.scale.multiplyScalar(1.1);
+    console.log(objIvy.scale.length());
+}
 
 export function onShadowMapToggleButtonClick()
 {

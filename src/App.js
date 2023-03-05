@@ -1,6 +1,6 @@
 
 import './App.css';
-import Cat, {addDonut} from './cat.js';
+import Cat, {addDonut, incrementCatSize, decrementCatSize} from './cat.js';
 import { Button } from '@mui/material';
 import React, { useState } from 'react';
 
@@ -11,6 +11,8 @@ function Increment(){
     onClick={() => {
       setCount(count+1)
       addDonut();
+      incrementCatSize();
+
     }}>{count} Donuts </Button>
   );
 }
@@ -26,7 +28,10 @@ function App() {
           CatPet v.0.0
           <br/>
           <Increment/>
-       
+          <Button variant="contained" style={{ margin:"1em"}} onClick={() => {
+              decrementCatSize();
+              }}> Diet
+          </Button>
 
           {/* { <Button variant="contained" style={{ margin:"1em"}}
            onClick={() => {
