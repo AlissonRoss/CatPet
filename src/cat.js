@@ -192,7 +192,7 @@ renderer = new THREE.WebGLRenderer({
 });
 
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type    = THREE.PCFShadowMap;
 // renderer.setClearColor( 0xffffff, 1);
 document.body.appendChild( renderer.domElement );
 
