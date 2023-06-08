@@ -3,6 +3,7 @@ import './App.css';
 import Cat, {addDonut, incrementCatSize, decrementCatSize} from './cat.js';
 import { Button } from '@mui/material';
 import React, { useState } from 'react';
+import { CircularProgress, Box } from '@mui/material';
 
 function Increment(){
   const [count, setCount] = useState(0);
@@ -24,6 +25,9 @@ function App() {
       {/* <header className="App-header">
         CatPet v 0.0
       </header> */}
+          <Box id="loader">
+            <CircularProgress />
+          </Box>
           <Cat id="c" style={{ position:"absolute"}}/>
           CatPet v.0.0
           <br/>

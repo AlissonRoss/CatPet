@@ -80,12 +80,14 @@ function onWindowResize()
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight);
 }
-//PROMISE
+
 const loader = new GLTFLoader();
+
+//PROMISE
 const loadAsync = url => {
     return new Promise(resolve => {
       loader.load(url, gltf => {
-        resolve(gltf)
+        resolve(gltf);
       })
     })
   }
@@ -97,17 +99,17 @@ scene.background = bgTexture;
 
 //LOADS THIS FIRST TO AVOID ERRORS
 function init(){
-
+    
     if (wasInitCalled)
     {
         // ignore calls after the first
         return;
     }
-
+ 
     wasInitCalled = true;
-
     Promise.all([loadAsync(BlackCat), loadAsync(OrangeCat), loadAsync(Madi), loadAsync(Ivy)]).then(models => {
-
+        //START LOADING
+        const loadcss = document.getElementById('loader');
         // If a loaded file is mistakenly a scene instead of a model or is otherwise nested, then return the root 3D mesh.
         // This is needed for correct shadow casting and model rotation behavior.
         models = models.map(obj => {
@@ -154,7 +156,8 @@ function init(){
             cat.receiveShadow = true;  // allow cats to cast shadows on each other
             scene.add(cat);
         }
-
+        //FINISH LOAD
+        loadcss.classList.add('c');
         //RESIZES WINDOW
         window.addEventListener('resize', onWindowResize, false);
 
@@ -196,13 +199,6 @@ renderer.shadowMap.type    = THREE.PCFShadowMap;
 // renderer.setClearColor( 0xffffff, 1);
 document.body.appendChild( renderer.domElement );
 
-//Bouncing PARAMETERS AND CALC
-let acceleration = 9.8;
-let bounce_distance = 1;
-let bottom_position_y = 0;
-let time_step = 0.09;
-let time_counter = Math.sqrt(bounce_distance * 2 / acceleration);
-let initial_speed = acceleration * time_counter;
 
 function updatePhysics(currentTimeInMs, deltaTimeInMs)
 {
@@ -265,23 +261,6 @@ function animate(currentTimeInMs)
     requestAnimationFrame( animate );
 }
 
-//BOUNCE MODELS
-export function onBounceButtonClick()
-{
-    // while(time_counter > 0)
-    // {
-    //     if (objBlackCat.position.y < bottom_position_y && objOrangeCat.position.y < bottom_position_y) {
-    //         time_counter = 0;
-    //     }
-    //         // s2 = s1 + ut + (1/2)gt*t formula
-    //     //UNIFORMLY ACCELERATED MOTION for BOUNCE
-    //     let bounce = bottom_position_y + initial_speed * time_counter - 0.4 * acceleration * time_counter * time_counter;
-        
-    //     objBlackCat.position.y = bounce;
-    //     objOrangeCat.position.y = bounce;
-    //     time_counter += time_step;
-    // } 
-}
 //ADD TORUS
 export function addDonut()
 {
