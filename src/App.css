@@ -13,13 +13,15 @@
 }
 
 #loader {
-	position: flex;
+	position: fixed;
+  left:45vw;
+  bottom:50vh;
 	z-index: 2;
 	opacity: 1;
-  animation: fadein 5s;
 }
 #loader.c {
   opacity: 0;
+  display: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {

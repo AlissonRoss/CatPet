@@ -26,7 +26,7 @@ function App() {
         CatPet v 0.0
       </header> */}
           <Box id="loader">
-            <CircularProgress />
+            <CircularProgress  size="10rem" />
           </Box>
           <Cat id="c" style={{ position:"absolute"}}/>
           CatPet v.0.0
