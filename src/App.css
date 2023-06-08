@@ -14,8 +14,11 @@
 
 #loader {
 	position: fixed;
-  left:45vw;
+  margin:auto;
+  left:0;
+  right:0;
   bottom:50vh;
+  width:100vw;
 	z-index: 2;
 	opacity: 1;
 }
